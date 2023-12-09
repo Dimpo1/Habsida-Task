@@ -1,0 +1,96 @@
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+// Class representing the logic for parsing and calculating expressions
+class ExpressionCalculator {
+    private int a, b, c;
+    private String op1, op2;
+
+    // Constructor to initialize the expression parameters
+    public ExpressionCalculator(int a, String op1, int b, String op2, int c) {
+        this.a = a;
+        this.op1 = op1;
+        this.b = b;
+        this.op2 = op2;
+        this.c = c;
+    }
+
+    // Method to perform the actual calculations based on the provided operators
+    public int calculate() {
+        int result = applyOperator(op1, a, b);
+        result = applyOperator(op2, result, c);
+        return result;
+    }
+
+    // Helper method to apply an operator to two operands
+    private int applyOperator(String operator, int operand1, int operand2) {
+        switch (operator) {
+            case "+":
+                return operand1 + operand2;
+            case "-":
+                return operand1 - operand2;
+            case "*":
+                return operand1 * operand2;
+            case "/":
+                if (operand2 == 0) {
+                    throw new IllegalArgumentException("Division by zero. Exiting...");
+                }
+                return operand1 / operand2;
+            default:
+                throw new IllegalArgumentException("Invalid operator. Exiting...");
+        }
+    }
+}
+
+// Main application class
+public class CalculatorApp {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            // Get input from the user
+            System.out.print("Enter a mathematical expression: ");
+            String expression = scanner.nextLine();
+
+            // Parse and calculate the expression
+            ExpressionCalculator expressionCalculator = parseExpression(expression);
+            int result = expressionCalculator.calculate();
+
+            // Print the result
+            System.out.println("Result: " + result);
+
+        } catch (IllegalArgumentException e) {
+            // Handle errors and print error messages
+            System.err.println(e.getMessage());
+
+        } finally {
+            // Close the scanner
+            scanner.close();
+        }
+    }
+
+    // Helper method to parse the expression and create an ExpressionCalculator object
+    private static ExpressionCalculator parseExpression(String expression) {
+        // Regular expression to match the valid expressions
+        String regex = "^(\\d+)\\s*([+\\-*/])\\s*(\\d+)\\s*([+\\-])\\s*(\\d+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(expression);
+
+        // Check if the expression matches the expected format
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid expression format. Exiting...");
+        }
+
+        // Extract numbers and operators from the matched expression
+        int a = Integer.parseInt(matcher.group(1));
+        String op1 = matcher.group(2);
+        int b = Integer.parseInt(matcher.group(3));
+        String op2 = matcher.group(4);
+        int c = Integer.parseInt(matcher.group(5));
+
+        // Create an ExpressionCalculator object
+        return new ExpressionCalculator(a, op1, b, op2, c);
+    }
+}
